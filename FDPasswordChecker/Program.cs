@@ -3,24 +3,33 @@ using Xunit;
 
 public class Program
 {
-    [Theory]
-    [InlineData("asdfAsdf-123")]
-    void should_be_safe(string input)
+    static List<string> GetFilteredPassword(Func<string, bool> filter)
     {
-        var checkUpper = CheckUpper(input);
-        var checkLower = CheckLower(input);
-        var checkSpecialCase = CheckSpecialCase(input);
-        var checkNumber = CheckNumber(input);
+        var list = new List<string> { "apple", "Banan123", "hlaksdfjLKJALKSDF-1234" };
 
-        var checker = And<string>(checkUpper, checkLower, checkSpecialCase, checkNumber);
-        
-        checker.Should().Be(true);
+        return list.Where(filter).ToList();
     }
 
-    private static Func<string, bool> CheckUpper => x => x.Any(char.IsUpper);
-    private static Func<string, bool> CheckLower => x => x.Any(char.IsLower);
-    private static Func<string, bool> CheckNumber => x => x.Any(char.IsDigit);
-    private static Func<string, bool> CheckSpecialCase => x => x.Any(c => !char.IsLetterOrDigit(c));
+    [Theory]
+    [InlineData(1)]
+    void should_be_safe(int count)
+    {
+        var checkUpper = CheckUpper();
+        var checkLower = CheckLower();
+        var checkSpecialCase = CheckSpecialCase();
+        var checkNumber = CheckNumber();
+
+        var checker = And(checkUpper, checkLower, checkSpecialCase, checkNumber);
+        var actual = GetFilteredPassword(checker);
+        
+        actual.Count.Should().Be(count);
+    }
+
+    private static Func<string, bool> CheckUpper() => x => x.Any(char.IsUpper);
+    private static Func<string, bool> CheckLower() => x => x.Any(char.IsLower);
+    private static Func<string, bool> CheckNumber() => x => x.Any(char.IsDigit);
+    private static Func<string, bool> CheckSpecialCase() => x => x.Any(c => !char.IsLetterOrDigit(c));
+
     static Func<T, bool> And<T>(params Func<T, bool>[] checkers) =>
         x => checkers.All(checker => checker(x));
 }
