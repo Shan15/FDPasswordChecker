@@ -9,7 +9,7 @@ public class Program
     [InlineData("hlaksdfjLKJALKSDF-1234", true)]
     void should_be_safe(string password, bool isSafe)
     {
-        var checker = And(CheckUpper, CheckLower, CheckNumber, CheckSpecialCase, CheckUpper2);
+        var checker = And(CheckUpper, CheckLower, CheckNumber, CheckSpecialCase);
 
         checker(password).Should().Be(isSafe);
     }
